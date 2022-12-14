@@ -19,8 +19,17 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.models import Model
 import pickle
 import pandas as pd
+import os
+import imghdr
+#import tensorflow-gpu
 
 
 ### Preprocess image
 
-data = pd.read_csv('german-traffic-signs/signnames.csv')
+#data_dir = os.listdir(r"C:\Users\madok\Documents\Smart-Tech-CA1\tiny-imagenet-200\val\images")
+#print(data_dir)
+
+img = cv2.imread(os.path.join('tiny-imagenet-200','val','images', 'val_0.jpeg'))
+print(img.shape)
+plt.imshow(img)
+plt.show()
