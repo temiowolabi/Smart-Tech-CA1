@@ -24,6 +24,7 @@ import imghdr
 import zipfile
 import requests
 from io import StringIO, BytesIO
+import matplotlib.image as mpimg
 #import tensorflow-gpu
 
 BATCH_SIZE = 20
@@ -35,6 +36,10 @@ NUM_VAL_IMAGES = 10000
 VAL_IMAGES_DIR = './tiny-imagenet-200/val/'
 
 IMAGES_URL = 'http://cs231n.stanford.edu/tiny-imagenet-200.zip'
+IMAGES_NUM = 100000
+IMAGE_SIZE = 64
+NUM_CHANNELS = 3
+IMAGE_ARR_SIZE = IMAGE_SIZE * IMAGE_SIZE * NUM_CHANNELS
 
 ### Preprocess image
 
@@ -49,7 +54,46 @@ def download_images(url):
     zip_ref.extractall('./')
     zip_ref.close()
 
+#loading the images
+
+def loading_image(imagedir, batch_size=500):
+    image_index = 0
+    images = np.ndarray(shape=(IMAGES_NUM, IMAGE_ARR_SIZE))
+    names = []
+    labels = []
+
+    for i in os.listdir():
+        if os.path.isdir(imagedir + i + '/images/'):
+            type = os.listdir(imagedir + i + '/images/')
+            #Looping through all the images of a type directory
+            batch_index = 0
+            
+            for image in type:
+                image_file = os.path.join(imagedir, i + '/images/', image)
+
+                #Reading Images as they are; n
+                image_data = mpimg.imread(image_file)
+
+                
+                if (image_data.shape == (IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS)):
+                    images[image_index, :] = image_data.flatten()
+
+                    labels.append(i)
+                    names.append(image)
+                    
+                    image_index += 1
+                    batch_index += 1
+                if (batch_index >= batch_size):
+                    break;
+
+    return (images, np.asarray(labels), np.asarray(names))
+
+
+
+
+
 download_images(IMAGES_URL)
+training_images, training_labels, training_files = loading_image(TRAINING_IMAGES_DIR, batch_size=BATCH_SIZE)
 
 
 #data_dir = os.listdir(r"C:\Users\madok\Documents\Smart-Tech-CA1\tiny-imagenet-200\val\images")
