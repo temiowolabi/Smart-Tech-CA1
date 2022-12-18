@@ -25,6 +25,7 @@ import zipfile
 import requests
 from io import StringIO, BytesIO
 import matplotlib.image as mpimg
+import matplotlib
 #import tensorflow-gpu
 
 BATCH_SIZE = 20
@@ -62,7 +63,7 @@ def loading_image(imagedir, batch_size=500):
     names = []
     labels = []
 
-    for i in os.listdir():
+    for i in os.listdir(imagedir):
         if os.path.isdir(imagedir + i + '/images/'):
             type = os.listdir(imagedir + i + '/images/')
             #Looping through all the images of a type directory
@@ -73,6 +74,8 @@ def loading_image(imagedir, batch_size=500):
 
                 #Reading Images as they are; n
                 image_data = mpimg.imread(image_file)
+                plt.imshow(image, cmap="gray")
+                plt.show()
 
                 
                 if (image_data.shape == (IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS)):
@@ -88,13 +91,33 @@ def loading_image(imagedir, batch_size=500):
 
     return (images, np.asarray(labels), np.asarray(names))
 
-
+#displaying the image
+def plot_object(data):
+    plt.figure(figsize=(1,1))
+    image = data.reshape(IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS)
+    plt.imshow(image, cmap = matplotlib.cm.binary,
+               interpolation="nearest")
+    plt.axis("off")
+    plt.show()
 
 
 
 download_images(IMAGES_URL)
-training_images, training_labels, training_files = loading_image(TRAINING_IMAGES_DIR, batch_size=BATCH_SIZE)
+#training_images, training_labels, training_files = loading_image(TRAINING_IMAGES_DIR, batch_size=BATCH_SIZE)
 
+for i in os.listdir(TRAINING_IMAGES_DIR):
+    type = os.listdir(TRAINING_IMAGES_DIR + i + '/images/')
+    #Looping through all the images of a type directory
+    batch_index = 0
+            
+    for image in type:
+        image_file = os.path.join(TRAINING_IMAGES_DIR, i + '/images/', image)
+
+        #Reading Images as they are; n
+        image_data = mpimg.imread(image_file)
+        plot_object(image_data)
+        break; #only want to see one image
+        
 
 #data_dir = os.listdir(r"C:\Users\madok\Documents\Smart-Tech-CA1\tiny-imagenet-200\val\images")
 #print(data_dir)
