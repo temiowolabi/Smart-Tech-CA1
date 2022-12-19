@@ -26,6 +26,7 @@ import requests
 from io import StringIO, BytesIO
 import matplotlib.image as mpimg
 import matplotlib
+from sklearn import preprocessing
 #import tensorflow-gpu
 
 BATCH_SIZE = 20
@@ -57,72 +58,27 @@ def download_images(url):
 
 #loading the images
 
-def loading_image(imagedir, batch_size=500):
-    image_index = 0
-    images = np.ndarray(shape=(IMAGES_NUM, IMAGE_ARR_SIZE))
-    names = []
-    labels = []
+def trainingImages(dir):
+    images = []
+    for i in os.listdir(dir):
+        if os.path.isdir(dir + i + '/images/'):
+            path = os.listdir(dir + i + '/images/')
 
-    for i in os.listdir(imagedir):
-        if os.path.isdir(imagedir + i + '/images/'):
-            type = os.listdir(imagedir + i + '/images/')
-            #Looping through all the images of a type directory
-            batch_index = 0
-            
-            for image in type:
-                image_file = os.path.join(imagedir, i + '/images/', image)
-
-                #Reading Images as they are; n
-                image_data = mpimg.imread(image_file)
-                plt.imshow(image, cmap="gray")
+            for image in path:
+                img_arr = cv2.imread(os.path.join(dir + i + '/images/', image), cv2.IMREAD_GRAYSCALE)
+                plt.imshow(img_arr, cmap="gray")
                 plt.show()
 
-                
-                if (image_data.shape == (IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS)):
-                    images[image_index, :] = image_data.flatten()
 
-                    labels.append(i)
-                    names.append(image)
-                    
-                    image_index += 1
-                    batch_index += 1
-                if (batch_index >= batch_size):
-                    break;
-
-    return (images, np.asarray(labels), np.asarray(names))
-
-#displaying the image
-def plot_object(data):
-    plt.figure(figsize=(1,1))
-    image = data.reshape(IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS)
-    plt.imshow(image, cmap = matplotlib.cm.binary,
-               interpolation="nearest")
-    plt.axis("off")
-    plt.show()
 
 
 
 download_images(IMAGES_URL)
-#training_images, training_labels, training_files = loading_image(TRAINING_IMAGES_DIR, batch_size=BATCH_SIZE)
+trainingImages(TRAINING_IMAGES_DIR)
 
-for i in os.listdir(TRAINING_IMAGES_DIR):
-    type = os.listdir(TRAINING_IMAGES_DIR + i + '/images/')
-    #Looping through all the images of a type directory
-    batch_index = 0
-            
-    for image in type:
-        image_file = os.path.join(TRAINING_IMAGES_DIR, i + '/images/', image)
 
-        #Reading Images as they are; n
-        image_data = mpimg.imread(image_file)
-        plot_object(image_data)
-        break; #only want to see one image
-        
 
-#data_dir = os.listdir(r"C:\Users\madok\Documents\Smart-Tech-CA1\tiny-imagenet-200\val\images")
-#print(data_dir)
 
-#img = cv2.imread(os.path.join('tiny-imagenet-200','val','images', 'val_0.jpeg'))
-#print(img.shape)
-#plt.imshow(img)
-#plt.show()
+
+
+
