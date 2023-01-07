@@ -69,7 +69,7 @@ def training_data():
     name_index = {}
     for name in names:
         folder = DIR + "train/" + name + "/images/"
-        print(folder)
+       # print(folder)
         for img in os.listdir(TRAINING_IMAGES_DIR + name + "/images/"):
             images.append(mpimg.imread(folder + img))
             labels.append(name)
@@ -186,11 +186,11 @@ download_images(IMAGES_URL)
 images, labels, bounding_boxes = training_data()
 
 # Visualise some of the images and their labels
-n_images = 3  # Number of images to display
-for i in range(n_images):
-    plt.imshow(images[i])
-    plt.title(labels[i])
-    plt.show()
+# n_images = 3  # Number of images to display
+# for i in range(n_images):
+#     plt.imshow(images[i])
+#     plt.title(labels[i])
+#     plt.show()
 
 # Iterating over images and displaying a label for each image
 
@@ -200,3 +200,7 @@ min_bounding_box = np.min(bounding_box_values)  # Calculate min bounding box
 max_bounding_box = np.max(bounding_box_values)  # Calculate max bounding box
 print("Minimum bounding box value:", min_bounding_box)
 print("Maximum bounding box value:", max_bounding_box)
+
+# Print the number of images and labels
+print("Number of images:", len(images))
+print("Number of labels:", len(labels))
