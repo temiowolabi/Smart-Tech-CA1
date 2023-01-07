@@ -15,7 +15,7 @@ DIR = './tiny-imagenet-200/'
 TEST_IMAGES_DATA = './tiny-imagenet-200/test'
 TRAINING_IMAGES_DIR = './tiny-imagenet-200/train/'
 VAL_IMAGES_DIR = './tiny-imagenet-200/val/'
-VAL_DATA = 'val_annotations.txt'
+VALIDATION_ANNOTATIONS_FILE = 'val_annotations.txt'
 WORDNETID = 'wnids.txt'
 WORDS = 'words.txt'
 IMAGES_URL = 'http://cs231n.stanford.edu/tiny-imagenet-200.zip'
@@ -26,14 +26,15 @@ IMAGES_URL = 'http://cs231n.stanford.edu/tiny-imagenet-200.zip'
 # Downloading folder
 def download_images(url):
     if (os.path.isdir(TRAINING_IMAGES_DIR)):
-        print ('Images have already been downloaded')
+        print('Images have already been downloaded')
         return
-    
+
     r = requests.get(url, stream=True)
-    print ('Downloading ' + url )
+    print('Downloading ' + url)
     zip_ref = zipfile.ZipFile(BytesIO(r.content))
     zip_ref.extractall('./')
     zip_ref.close()
+
 
 def validation_data():
     val_images = []
@@ -43,7 +44,7 @@ def validation_data():
     val_h = []
     val_w = []
 
-    with open(VAL_IMAGES_DIR+VAL_DATA) as f:
+    with open(VAL_IMAGES_DIR + VALIDATION_ANNOTATIONS_FILE) as f:
         text = f.readlines()
         for i in text:
             i_items = i.strip().split('\t')
@@ -59,7 +60,7 @@ def validation_data():
 
 def training_data():
     images = []
-    labels= []
+    labels = []
 
     with open(DIR + WORDNETID) as file:
         names = [label.strip() for label in file.readlines()]
@@ -73,7 +74,7 @@ def training_data():
             images.append(mpimg.imread(folder + img))
             labels.append(name)
             name_index[img] = index
-            index +=1
+            index += 1
 
     bounding_box = [None for _ in range(len(images))]
     for name in names:
@@ -87,15 +88,11 @@ def training_data():
 
 
 def labels():
-    
     with open(DIR + WORDNETID) as file:
         labels = [label.strip() for label in file.readlines()]
-    index = {label:index for index, label in enumerate(labels)}
+    index = {label: index for index, label in enumerate(labels)}
 
     return index
-
-
-
 
 
 def test_data():
@@ -110,9 +107,7 @@ def test_data():
     return test_img, index
 
 
-
 def resize_images(input_dir, output_dir, size):
-
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
@@ -144,6 +139,12 @@ def normalize_images(input_dir, output_dir):
         np.save(os.path.join(output_dir, filename), image)
 
 
+# arr1 = np.array([1, 2, 3])
+# arr2 = np.array([4, 5, 6, 7])
+#
+# arr2 = np.resize(arr2, arr1.shape)
+# mean = np.mean([arr1, arr2])
+
 
 def gray_scale(img):
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -158,16 +159,15 @@ def equalise(img):
 def preprocess(img):
     img = gray_scale(img)
     img = equalise(img)
-    img = img/255
+    img = img / 255
     return img
 
 
-
 download_images(IMAGES_URL)
-#names, labels, x, y, h, w = validation_data()
-#names = training_data()
-#training_data()
-#print(names)
+# names, labels, x, y, h, w = validation_data()
+# names = training_data()
+# training_data()
+# print(names)
 # test1, test2 = test_data()
 
 # plt.imshow(test1[0])
@@ -178,3 +178,25 @@ download_images(IMAGES_URL)
 
 # plt.figure(figsize=(5,5))
 # plt.show()
+
+
+# DATA EXPLORATION
+
+# Load the training data
+images, labels, bounding_boxes = training_data()
+
+# Visualise some of the images and their labels
+n_images = 3  # Number of images to display
+for i in range(n_images):
+    plt.imshow(images[i])
+    plt.title(labels[i])
+    plt.show()
+
+# Iterating over images and displaying a label for each image
+
+# Calculate summary statistics for the bounding boxes
+bounding_box_values = [box for box in bounding_boxes if box is not None]
+min_bounding_box = np.min(bounding_box_values)  # Calculate min bounding box
+max_bounding_box = np.max(bounding_box_values)  # Calculate max bounding box
+print("Minimum bounding box value:", min_bounding_box)
+print("Maximum bounding box value:", max_bounding_box)
