@@ -182,72 +182,71 @@ def preprocess(img):
 
 download_images(IMAGES_URL)
 
-
-
 # Load the testing data
 images, label_list = test_data()
+def display_images():
+    # Visualise some of the images and their label_list
+    n_images = 3  # Number of images to display
+    for i in range(n_images):
+        plt.imshow(images[i])
+        #plt.title(label_list[i])
+        height, width = images[i].shape[:2]  # Retrieve image size
+        plt.text(x=0, y=0, s=f'{label_list[i]}: {height}x{width}')
+        plt.show()
 
-# Visualise some of the images and their label_list
-n_images = 3  # Number of images to display
-for i in range(n_images):
-    plt.imshow(images[i])
-    #plt.title(label_list[i])
-    height, width = images[i].shape[:2]  # Retrieve image size
-    plt.text(x=0, y=0, s=f'{label_list[i]}: {height}x{width}')
+
+def count_image_in_each_class():
+    # Count the number of images in each class
+    class_counts = Counter(label_list)
+
+    # Print the class counts
+    print(class_counts)
+
+    # Display a histogram of the class counts
+    plt.hist(class_counts.values())
     plt.show()
 
 
-# Count the number of images in each class
-class_counts = Counter(label_list)
 
-# Print the class counts
-print(class_counts)
+def display_image_by_size():
+    # Extract the width and height of the images
+    widths = [image.shape[1] for image in images]
+    heights = [image.shape[0] for image in images]
 
-# Display a histogram of the class counts
-plt.hist(class_counts.values())
-plt.show()
-
-
+    # Plot the widths and heights on a scatter plot
+    plt.scatter(widths, heights)
+    plt.show()
 
 
-# Extract the width and height of the images
-widths = [image.shape[1] for image in images]
-heights = [image.shape[0] for image in images]
+def model():
+    # Define the model
+    model = tf.keras.Sequential()
 
-# Plot the widths and heights on a scatter plot
-plt.scatter(widths, heights)
-plt.show()
+    # Add a convolutional layer
+    model.add(tf.keras.layers.Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(200, 200, 3)))
 
+    # Add a max pooling layer
+    model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
 
+    # Add a dropout layer
+    model.add(tf.keras.layers.Dropout(0.25))
 
-# Define the model
-model = tf.keras.Sequential()
+    # Add a flatten layer
+    model.add(tf.keras.layers.Flatten())
 
-# Add a convolutional layer
-model.add(tf.keras.layers.Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(200, 200, 3)))
+    # Add a dense layer
+    model.add(tf.keras.layers.Dense(128, activation='relu'))
 
-# Add a max pooling layer
-model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
+    # Add another dropout layer
+    model.add(tf.keras.layers.Dropout(0.5))
 
-# Add a dropout layer
-model.add(tf.keras.layers.Dropout(0.25))
+    # Add a final dense layer for the output
+    model.add(tf.keras.layers.Dense(NUM_CLASSES, activation='softmax'))
 
-# Add a flatten layer
-model.add(tf.keras.layers.Flatten())
-
-# Add a dense layer
-model.add(tf.keras.layers.Dense(128, activation='relu'))
-
-# Add another dropout layer
-model.add(tf.keras.layers.Dropout(0.5))
-
-# Add a final dense layer for the output
-model.add(tf.keras.layers.Dense(NUM_CLASSES, activation='softmax'))
-
-# Compile the model
-model.compile(loss=tf.keras.losses.sparse_categorical_crossentropy,
-              optimizer=tf.keras.optimizers.Adam(),
-              metrics=['accuracy'])
+    # Compile the model
+    model.compile(loss=tf.keras.losses.sparse_categorical_crossentropy,
+                  optimizer=tf.keras.optimizers.Adam(),
+                  metrics=['accuracy'])
 
 
 
