@@ -182,6 +182,37 @@ def preprocess(img):
 
 download_images(IMAGES_URL)
 
+
+X_train, y_train = np.array(training_data())
+
+#ßX_train = np.array(X_train)
+#X_train = preprocess_data(X_train)
+
+
+labels = set(y_train)
+label_to_integer = {label: index for index, label in enumerate(labels)}
+
+def one_hot_encode(labels):
+    # Convert the labels to integers
+    integer_labels = [label_to_integer[label] for label in labels]
+    # One-hot encode the labels
+    one_hot_labels = keras.utils.to_categorical(integer_labels, num_classes=NUM_CLASSES)
+    return one_hot_labels
+
+
+y_train = one_hot_encode(y_train)
+
+X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2)
+
+# Preprocess the validation data
+X_val, y_val = np.array(validation_data())
+
+
+#X_val = preprocess_data(X_val)
+y_val = one_hot_encode(y_val)
+print(len(X_val))
+print(len(y_val))
+
 # Load the testing data
 images, label_list = test_data()
 def display_images():
@@ -218,119 +249,26 @@ def display_image_by_size():
     plt.show()
 
 
-def model():
-    # Define the model
-    model = tf.keras.Sequential()
+#Define the model
+model = tf.keras.Sequential()
+# Add a convolutional layer with 32 filters, a 3x3 kernel, and padding set to 'same'
+model.add(tf.keras.Conv2D(32, kernel_size=(3, 3), padding='same', activation='relu', input_shape=(64, 64, 3)))
+# Add a max pooling layer with a 2x2 pool size
+model.add(tf.keras.MaxPooling2D(pool_size=(2, 2)))
+# Add a flatten layer
+model.add(tf.keras.Flatten())
+# Add a dense layer with 128 units and ReLU activation
+model.add(tf.keras.Dense(128, activation='relu'))
+# Add a dense layer with NUM_CLASSES units and softmax activation
+model.add(tf.keras.Dense(NUM_CLASSES, activation='softmax'))
 
-    # Add a convolutional layer
-    model.add(tf.keras.layers.Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(200, 200, 3)))
+# Compile the model
+model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-    # Add a max pooling layer
-    model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
+# # Train the model
+model.fit(X_train, y_train, epochs=10, batch_size=64)
 
-    # Add a dropout layer
-    model.add(tf.keras.layers.Dropout(0.25))
+val_loss, val_acc = model.evaluate(X_val, y_val)
+print('Validation loss:', val_loss)
+print('Validation accuracy:', val_acc)
 
-    # Add a flatten layer
-    model.add(tf.keras.layers.Flatten())
-
-    # Add a dense layer
-    model.add(tf.keras.layers.Dense(128, activation='relu'))
-
-    # Add another dropout layer
-    model.add(tf.keras.layers.Dropout(0.5))
-
-    # Add a final dense layer for the output
-    model.add(tf.keras.layers.Dense(NUM_CLASSES, activation='softmax'))
-
-    # Compile the model
-    model.compile(loss=tf.keras.losses.sparse_categorical_crossentropy,
-                  optimizer=tf.keras.optimizers.Adam(),
-                  metrics=['accuracy'])
-
-
-
-# # # Load the training data
-# # X_train = []
-# # Y_train = []
-# #
-# # # Load the validation data
-# # X_val = []
-# # Y_val = []
-# #
-# # # Load the test data
-# # X_test = []
-# # Y_test = []
-# #
-# #
-# # X_test_processed = [preprocess(image) for image in X_test]
-# #
-# # # names, label_list, x, y, h, w = validation_data()
-# # # names = training_data()
-# # # training_data()
-# # # print(names)
-# # # test1, test2 = test_data()
-# #
-# # # plt.imshow(test1[0])
-# #
-# # # plt.title(test2[0])
-# # # plt.xlabel("X-axis")
-# # # plt.ylabel("Y-axix")
-# #
-# # # plt.figure(figsize=(5,5))
-# # # plt.show()
-#
-#
-# # DATA EXPLORATION
-#
-# # Load the testing data
-# images, label_list = test_data()
-#
-# # Visualise some of the images and their label_list
-# n_images = 3  # Number of images to display
-# for i in range(n_images):
-#     plt.imshow(images[i])
-#     #plt.title(label_list[i])
-#     height, width = images[i].shape[:2]  # Retrieve image size
-#     plt.text(x=0, y=0, s=f'{label_list[i]}: {height}x{width}')
-#     plt.show()
-#
-# # Iterating over images and displaying a label for each image
-#
-# # Calculate summary statistics for the bounding boxes
-# # bounding_box_values = [box for box in bounding_boxes if box is not None]
-# # min_bounding_box = np.min(bounding_box_values)  # Calculate min bounding box
-# # max_bounding_box = np.max(bounding_box_values)  # Calculate max bounding box
-# # print("Minimum bounding box value:", min_bounding_box)
-# # print("Maximum bounding box value:", max_bounding_box)
-#
-# # Print the number of images and label_list
-# print("Number of images:", len(images))
-# print("Number of label_list:", len(label_list))
-#
-#
-# # Display the image sizes
-# # def display_image_sizes(images):
-# #   for image in images:
-# #     plt.imshow(image)
-# #     plt.show()
-# # for image in images:
-# #   height, width, channels = image.shape
-# #   print(f"Image size: {height}x{width}")
-# #
-# #
-# #
-# # display_image_sizes(images)
-# # # display_image_sizes(val_images)
-# # # display_image_sizes(test_img)
-# #
-# #
-# # def display_image_classes(label_list):
-# #   for label in label_list:
-# #     print(label)
-# #
-# #
-# # display_image_classes(label_list)
-# # display_image_classes(val_labels)
-#
-#
